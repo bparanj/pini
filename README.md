@@ -1,4 +1,4 @@
-
+How to build a Pinterest Clone in Rails 5
 
 ## Starter Rails 5 App
 
@@ -26,7 +26,7 @@ Create some records using the UI.
 
 Add:
 
-```
+```ruby
 gem 'devise', github: 'plataformatec/devise'
 ```
 
@@ -38,7 +38,7 @@ rails generate devise:install
 
 Define the home page in routes.rb.
 
-```
+```ruby
 root to: "pins#index"
 ```
 
@@ -77,7 +77,7 @@ to layout. You will now be able to signup, signin and logout.
 
 ## File Uploading using Paperclip
 
-```
+```rhtml
 gem "paperclip", "~> 5.0.0.beta1"
 ```
 
@@ -85,7 +85,7 @@ bundle
 
 Add:
 
-```
+```ruby
 has_attached_file :image, :styles => { :medium => "300x300>" }
 validates_attachment_content_type :image, :content_type => /\Aimage\/.*\Z/
 ```
@@ -102,7 +102,7 @@ rails db:migrate
 
 Add:
 
-```
+```rthml
 html: { multipart: true }
 ```
 
@@ -110,7 +110,7 @@ to pin form partial.
 
 Add file upload field to pin form partial.
 
-```
+```rhtml
 <div class='field'>
   <%= f.label :image %>	
   <%= f.file_field :image %>
@@ -125,7 +125,7 @@ User must exist
 
 if you try to create a pin without a user associated.
 
-```
+```ruby
 def new
   @pin = current_user.pins.build
 end
@@ -133,7 +133,7 @@ end
 
 Image will not be uploaded. To fix:
 
-```
+```ruby
 def pin_params
   params.require(:pin).permit(:title, :description, :image)
 end
@@ -159,7 +159,7 @@ In application.scss
  
 Change the pin show page.
 
-``` 
+```rhtml
 <div class="transitions-enabled" id="pins">
   <% @pins.each do |pin| %>
     <div class="box panel panel-default">
@@ -278,6 +278,111 @@ Add CSS to application.scss:
  textarea {
  	min-height: 250px;
  }
- ```
+```
  
- Reload the page. You will now see styled grids for the pins.
+Reload the page. You will now see styled grids for the pins.
+ 
+ ## Integrate Twitter Bootstrap 4
+
+``` 
+gem 'bootstrap', '~> 4.0.0.alpha3'
+```
+
+
+bundle
+
+ 
+In application.scss:
+ 
+```
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require 'masonry/transitions'
+ */
+
+@import "bootstrap";
+```
+
+``` 
+//= require bootstrap
+```
+ 
+In application.js
+
+``` 
+//= require jquery
+//= require bootstrap
+//= require jquery_ujs
+//= require turbolinks
+//= require_tree .
+```
+ 
+In layouts/_header.html.erb:
+
+``` 
+ <nav class="navbar navbar-dark bg-inverse">
+   <%= link_to "Movie Reviews", root_path, class: "navbar-brand" %>
+   <ul class="nav navbar-nav">
+
+     <li class="nav-item active">
+       <a class="nav-link" href="movies/new">New Pin <span class="sr-only">(current)</span></a>
+     </li>
+     <li class="nav-item">
+       <a class="nav-link" href="#">About</a>
+     </li>
+   </ul>
+   <form class="form-inline pull-xs-right">
+     <input class="form-control" type="text" placeholder="Search">
+     <button class="btn btn-success-outline" type="submit">Search</button>
+   </form>
+ </nav>
+```
+ 
+Add:
+
+``` 
+<%= render 'layouts/header' %>
+```
+ 
+to layout file.
+ 
+ 
+In application.js:
+
+``` 
+//= require masonry/jquery.masonry
+```
+ 
+``` 
+//= require jquery
+//= require bootstrap
+//= require jquery_ujs
+//= require masonry/jquery.masonry
+//= require turbolinks
+//= require_tree .
+```
+ 
+ pins.coffee
+ 
+
+ $ ->
+   $('#pins').imagesLoaded ->
+     $('#pins').masonry
+       itemSelector: '.box'
+       isFitWidth: true
+ 
+ Now you will see the transition effect when the browser window is resized.
+ 
+ ## Vote on a Pin
+ 
+ 

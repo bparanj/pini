@@ -11,12 +11,8 @@
         Submitted by
         <%= pin.user.email %>
       </p>
-    </div>
-	<%= link_to 'Edit', edit_pin_path(pin) %>
-	<%= link_to 'Destroy', pin, method: :delete, data: { confirm: 'Are you sure?' } %>
-	
+    </div>	
   <% end %>	
 </div>	
-
 
 <%= link_to 'New Pin', new_pin_path %>
