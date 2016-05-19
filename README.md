@@ -385,4 +385,160 @@ In application.js:
  
  ## Vote on a Pin
  
+ gem 'acts_as_votable', '~> 0.10.0'
+ 
+ bundle
+ 
+ rails generate acts_as_votable:migration
+ rails db:migrate
+ 
+ acts_as_votable
+ 
+ in pin model.
+ 
+ resources :pins do
+   put 'like', to: 'pins#upvote'
+ end
+ 
+ pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+ 
+ In pin show page:
+ 
+ <%= link_to like_pin_path(@pin), method: :put, class: "btn btn-default" do %>
+   <span class="glyphicon glyphicon-heart"></span>
+   <%= @pin.get_upvotes.size %>
+ <% end %>
+ 
+ 
+ 
+ <% if user_signed_in? %>
+   <%= link_to like_pin_path(@pin), method: :put, class: "btn btn-default" do %>
+     <span class="glyphicon glyphicon-heart"></span>
+     <%= @pin.get_upvotes.size %>
+   <% end %>
+ 
+   <%= link_to "Edit", edit_pin_path, class: "btn btn-default" %>
+   <%= link_to "Delete", pin_path, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-default" %>
+ <% end %>
+ 
+ undefined method `like_pin_path'
+ 
+ pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+ 
+ <%= link_to pin_like_path(@pin), method: :put, class: "btn btn-default" do %>
+ ...
+ 
+ 
+ Fixing Glyphicons Problem
+ 
+ rails c
+ Loading development environment (Rails 5.0.0.rc1)
+ > Rails.application.config.assets.paths
+  => ["/Users/bparanj/projects/pini/app/assets/config"...]
+ > Rails.application.config.assets.paths.each do |x|
+       p x
+     end;nil
+ "/Users/bparanj/projects/pini/app/assets/config"
+ "/Users/bparanj/projects/pini/app/assets/images"
+ "/Users/bparanj/projects/pini/app/assets/javascripts"
+ "/Users/bparanj/projects/pini/app/assets/stylesheets"
+ "/Users/bparanj/projects/pini/vendor/assets/javascripts"
+ "/Users/bparanj/projects/pini/vendor/assets/stylesheets"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/images"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/javascripts"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/stylesheets"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/jquery-rails-4.1.1/vendor/assets/javascripts"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/coffee-rails-4.1.1/lib/assets/javascripts"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/actioncable-5.0.0.rc1/lib/assets/compiled"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/turbolinks-source-5.0.0.beta4/lib/assets/javascripts"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/bootstrap-4.0.0.alpha3/assets/stylesheets"
+ "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/bootstrap-4.0.0.alpha3/assets/javascripts"
+  => nil
+  
+
+Bootstrap gem does not come with glyphicons support. Download https://github.com/twbs/bootstrap-sass/tree/master/assets/fonts/bootstrap and copy fonts to vendor/assets/fonts folder.
+
+
+In application.rb.
+
+config.assets.paths << "#{Rails}/vendor/assets/fonts"
+
+In application.scss:
+
+@font-face {
+   font-family: 'Glyphicons Halflings';
+   src: url('/assets/glyphicons-halflings-regular.eot');
+   src: url('/assets/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
+      url('/assets/glyphicons-halflings-regular.woff') format('woff'),
+      url('/assets/glyphicons-halflings-regular.ttf') format('truetype'),
+      url('/assets/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+
+
+Uncaught Error: Bootstrap tooltips require Tether (http://github.hubspot.com/tether/)
+ 
+source 'https://rails-assets.org' do
+  gem 'rails-assets-tether', '>= 1.1.0'
+end
+
+to Gemfile. Run bundle.
+
+//= require tether
+
+after jQuery in application.js.
+
+
+gem "font-awesome-rails"
+bundle
+
+
+@import "font-awesome";
+
+in application.scss
+
+In the pin show view:
+
+<i class="fa fa-heart"></i>
+
+undefined method `upvote_by' for nil:NilClass
+
+before_action :set_pin, only: [:show, :edit, :update, :destroy, :upvote]
+  
+Couldn't find Pin with 'id'=
+
+rake routes | grep like
+                pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+				
+  resources :pins do
+    member do
+      put 'like', to: 'pins#upvote'
+    end
+  end
+
+undefined method `pin_like_path' 
+
+rake routes | grep like
+like_pin PUT    /pins/:id/like(.:format)       pins#upvote			  
+
+
+like_pin_path(@pin) 
+
+in pin show page.
+
+  before_action :authenticate_user!, except: [:index, :show]
+  
+  in pins controller.
+
+Now you can like for any puppy by clicking the heart icon.
+
+[Twitter Bootstrap 3 in a Rails 4 Application](http://www.erikminkel.com/2013/09/01/twitter-bootstrap-3-in-a-rails-4-application/ 'Twitter Bootstrap 3 in a Rails 4 Application')
+[Rails 4: How to Include Bootstrap Glyphicons](http://www.angkorbrick.com/2014/11/06/rails-4-how-to-include-bootstrap-glyphicons/ 'Rails 4: How to Include Bootstrap Glyphicons')
+[FontAwesome Rails Gem](https://github.com/bokmann/font-awesome-rails 'font-awesome-rails')  
+[FontAwesome Cheatsheet](http://fontawesome.io/cheatsheet/ 'font awesome cheatsheet')
+ 
+ 
+ 
+ 
+ 
  

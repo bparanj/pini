@@ -24,6 +24,8 @@ gem 'devise', github: 'plataformatec/devise'
 gem "paperclip", "~> 5.0.0.beta1"
 gem 'masonry-rails'
 gem 'bootstrap', '~> 4.0.0.alpha3'
+gem 'acts_as_votable', '~> 0.10.0'
+gem "font-awesome-rails"
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -34,6 +36,10 @@ group :development do
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
   gem 'web-console'
   gem 'listen', '~> 3.0.5'
+end
+
+source 'https://rails-assets.org' do
+  gem 'rails-assets-tether', '>= 1.1.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
