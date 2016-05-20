@@ -77,7 +77,7 @@ to layout. You will now be able to signup, signin and logout.
 
 ## File Uploading using Paperclip
 
-```rhtml
+```ruby
 gem "paperclip", "~> 5.0.0.beta1"
 ```
 
@@ -90,11 +90,13 @@ has_attached_file :image, :styles => { :medium => "300x300>" }
 validates_attachment_content_type :image, :content_type => /\Aimage\/.*\Z/
 ```
 
-to pin.rb.
+to pin.rb. Generate the fields required to upload image by running the paperclip generator.
 
 ```
 rails g paperclip pin image
 ```
+
+Modify the pins table by running the migration.
 
 ```
 rails db:migrate
@@ -106,9 +108,7 @@ Add:
 html: { multipart: true }
 ```
 
-to pin form partial.
-
-Add file upload field to pin form partial.
+to pin form partial. Add file upload field to pin form partial.
 
 ```rhtml
 <div class='field'>
@@ -123,7 +123,7 @@ You will get the error:
 User must exist
 ```
 
-if you try to create a pin without a user associated.
+if you try to create a pin without a user associated. Change the pins controller new action:
 
 ```ruby
 def new
@@ -131,7 +131,7 @@ def new
 end
 ```
 
-Image will not be uploaded. To fix:
+Image will not be uploaded. To fix the problem, add image field to the permitted fields in `pin_params` pins controller method:
 
 ```ruby
 def pin_params
@@ -139,17 +139,25 @@ def pin_params
 end
 ```
 
-
 You can now upload and view the image.
 
 
-In application.scss
+## Transition Effects using MasonryRails Gem
+
+Add masonry-rails gem to Gemfile.
+
+```ruby
+gem 'masonry-rails'
+```
+
+Run bundle. In application.scss:
 
 ```
 *= require 'masonry/transitions'
 ```
 
- 
+It will look like this:
+
 ``` 
 *= require 'masonry/transitions'
 *= require_tree .
@@ -157,7 +165,7 @@ In application.scss
 */
 ```
  
-Change the pin show page.
+Style the pin index page to enable transition effect provided by masonry-rails gem.
 
 ```rhtml
 <div class="transitions-enabled" id="pins">
@@ -165,17 +173,16 @@ Change the pin show page.
     <div class="box panel panel-default">
       <%= link_to (image_tag pin.image.url), pin %>
       <h2>
-         <%= link_to pin.title, pin %>
+        <%= link_to pin.title, pin %>
       </h2>
       <p class="user">
-         Submitted by
-         <%= pin.user.email %>
+        Submitted by
+        <%= pin.user.email %>
       </p>
-    </div>
- 	<%= link_to 'Edit', edit_pin_path(pin) %>
-    <%= link_to 'Destroy', pin, method: :delete, data: { confirm: 'Are you sure?' } %>	
+    </div>	
   <% end %>	
-</div>
+</div>	
+<%= link_to 'New Pin', new_pin_path %>
 ```
  
 Add CSS to application.scss:
@@ -282,17 +289,15 @@ Add CSS to application.scss:
  
 Reload the page. You will now see styled grids for the pins.
  
- ## Integrate Twitter Bootstrap 4
+## Integrate Twitter Bootstrap 4
 
-``` 
+Add bootstrap gem to Gemfile.
+
+```ruby
 gem 'bootstrap', '~> 4.0.0.alpha3'
 ```
 
-
-bundle
-
- 
-In application.scss:
+Run bundle. Require bootstrap in application.scss:
  
 ```
 /*
@@ -313,11 +318,13 @@ In application.scss:
 @import "bootstrap";
 ```
 
+Require bootstrap in application.js:
+
 ``` 
 //= require bootstrap
 ```
  
-In application.js
+It will now look like this:
 
 ``` 
 //= require jquery
@@ -327,25 +334,37 @@ In application.js
 //= require_tree .
 ```
  
-In layouts/_header.html.erb:
+Add signup, register, logout, account and new pin links in `layouts/_header.html.erb`:
 
-``` 
- <nav class="navbar navbar-dark bg-inverse">
-   <%= link_to "Movie Reviews", root_path, class: "navbar-brand" %>
-   <ul class="nav navbar-nav">
+```rhtml
+<nav class="navbar navbar-dark bg-inverse navbar-fixed-top">
+  <%= link_to "Puppy Reviews", root_path, class: "navbar-brand" %>
+  <ul class="nav navbar-nav">
 
-     <li class="nav-item active">
-       <a class="nav-link" href="movies/new">New Pin <span class="sr-only">(current)</span></a>
-     </li>
-     <li class="nav-item">
-       <a class="nav-link" href="#">About</a>
-     </li>
-   </ul>
-   <form class="form-inline pull-xs-right">
-     <input class="form-control" type="text" placeholder="Search">
-     <button class="btn btn-success-outline" type="submit">Search</button>
-   </form>
- </nav>
+    <% if user_signed_in? %>
+      <li class="nav-item">
+        <%= link_to "New Pin", new_pin_path, class: 'nav-link' %>
+      </li>
+
+      <li class="nav-item">
+		<%= link_to "Account", edit_user_registration_path, class: 'nav-link' %>
+      </li>
+
+      <li class="nav-item">
+		<%= link_to "Sign Out", destroy_user_session_path, method: :delete, class: 'nav-link' %>
+      </li>	  
+    <% else %>
+	    <li class="nav-item">
+			<%= link_to "Sign Up", new_user_registration_path, class: 'nav-link' %>	
+	    </li>
+
+	    <li class="nav-item">
+			<%= link_to "Sign In", new_user_session_path, class: 'nav-link' %>
+	    </li>
+    <% end %>
+		
+  </ul>
+</nav>
 ```
  
 Add:
@@ -354,15 +373,14 @@ Add:
 <%= render 'layouts/header' %>
 ```
  
-to layout file.
- 
- 
-In application.js:
+to layout file. In application.js:
 
 ``` 
 //= require masonry/jquery.masonry
 ```
  
+It will look like this:
+
 ``` 
 //= require jquery
 //= require bootstrap
@@ -372,173 +390,187 @@ In application.js:
 //= require_tree .
 ```
  
- pins.coffee
+In pins.coffee:
  
-
+```
  $ ->
    $('#pins').imagesLoaded ->
      $('#pins').masonry
        itemSelector: '.box'
        isFitWidth: true
+```
  
- Now you will see the transition effect when the browser window is resized.
+Now you will see the transition effect when the browser window is resized.
  
- ## Vote on a Pin
+## Vote on a Pin
+
+Add `acts_as_votable` gem to Gemfile.
+
+```ruby
+gem 'acts_as_votable', '~> 0.10.0'
+```
  
- gem 'acts_as_votable', '~> 0.10.0'
+Run bundle. Generate and create the tables required for voting functionality.
  
- bundle
+``` 
+rails generate acts_as_votable:migration
+rails db:migrate
+```
+
+Add:
+
+```ruby
+acts_as_votable
+```
  
- rails generate acts_as_votable:migration
- rails db:migrate
+in pin model. Define the route to vote in routes.rb.
  
- acts_as_votable
+```ruby
+resources :pins do
+  put 'like', to: 'pins#upvote'
+end
+```
+
+If you do `rails routes`, you can see the route to vote: 
+
+```
+pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+```
+
+In pin show page, display the like icon and the number of votes:
+
+```rhtml 
+<%= link_to like_pin_path(@pin), method: :put, class: "btn btn-secondary" do %>
+  <span class="glyphicon glyphicon-heart"></span>
+  <%= @pin.get_upvotes.size %>
+<% end %>
+``` 
+
+Display the like button only if a user is signed in. 
  
- in pin model.
- 
- resources :pins do
-   put 'like', to: 'pins#upvote'
- end
- 
- pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
- 
- In pin show page:
- 
- <%= link_to like_pin_path(@pin), method: :put, class: "btn btn-default" do %>
-   <span class="glyphicon glyphicon-heart"></span>
-   <%= @pin.get_upvotes.size %>
- <% end %>
- 
- 
- 
- <% if user_signed_in? %>
-   <%= link_to like_pin_path(@pin), method: :put, class: "btn btn-default" do %>
+```rhtml 
+<% if user_signed_in? %>
+  <%= link_to like_pin_path(@pin), method: :put, class: "btn btn-secondary" do %>
      <span class="glyphicon glyphicon-heart"></span>
      <%= @pin.get_upvotes.size %>
-   <% end %>
+  <% end %>
  
    <%= link_to "Edit", edit_pin_path, class: "btn btn-default" %>
-   <%= link_to "Delete", pin_path, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-default" %>
- <% end %>
+   <%= link_to "Delete", pin_path, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-secondary" %>
+<% end %>
+```
  
- undefined method `like_pin_path'
- 
- pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
- 
+If you go to the show pin page, you will get the error:
+
+```
+undefined method `like_pin_path'
+```
+
+The output of `rails routes` shows: 
+
+``` 
+pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+```
+
+Link the like icon to this path in the pin show page.
+
+``` 
  <%= link_to pin_like_path(@pin), method: :put, class: "btn btn-default" do %>
  ...
+```
  
- 
- Fixing Glyphicons Problem
- 
- rails c
- Loading development environment (Rails 5.0.0.rc1)
- > Rails.application.config.assets.paths
-  => ["/Users/bparanj/projects/pini/app/assets/config"...]
- > Rails.application.config.assets.paths.each do |x|
-       p x
-     end;nil
- "/Users/bparanj/projects/pini/app/assets/config"
- "/Users/bparanj/projects/pini/app/assets/images"
- "/Users/bparanj/projects/pini/app/assets/javascripts"
- "/Users/bparanj/projects/pini/app/assets/stylesheets"
- "/Users/bparanj/projects/pini/vendor/assets/javascripts"
- "/Users/bparanj/projects/pini/vendor/assets/stylesheets"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/images"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/javascripts"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/masonry-rails-0.2.4/vendor/assets/stylesheets"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/jquery-rails-4.1.1/vendor/assets/javascripts"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/coffee-rails-4.1.1/lib/assets/javascripts"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/actioncable-5.0.0.rc1/lib/assets/compiled"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/turbolinks-source-5.0.0.beta4/lib/assets/javascripts"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/bootstrap-4.0.0.alpha3/assets/stylesheets"
- "/Users/bparanj/.rvm/gems/ruby-2.3.1@rails5/gems/bootstrap-4.0.0.alpha3/assets/javascripts"
-  => nil
-  
+Bootstrap 4 does not come with glyphicons support anymore. Let's use fontawesome instead. Add font-awesome-rails gem to Gemfile.
 
-Bootstrap gem does not come with glyphicons support. Download https://github.com/twbs/bootstrap-sass/tree/master/assets/fonts/bootstrap and copy fonts to vendor/assets/fonts folder.
-
-
-In application.rb.
-
-config.assets.paths << "#{Rails}/vendor/assets/fonts"
-
-In application.scss:
-
-@font-face {
-   font-family: 'Glyphicons Halflings';
-   src: url('/assets/glyphicons-halflings-regular.eot');
-   src: url('/assets/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
-      url('/assets/glyphicons-halflings-regular.woff') format('woff'),
-      url('/assets/glyphicons-halflings-regular.ttf') format('truetype'),
-      url('/assets/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
-}
-
-
-
-Uncaught Error: Bootstrap tooltips require Tether (http://github.hubspot.com/tether/)
- 
-source 'https://rails-assets.org' do
-  gem 'rails-assets-tether', '>= 1.1.0'
-end
-
-to Gemfile. Run bundle.
-
-//= require tether
-
-after jQuery in application.js.
-
-
+```ruby
 gem "font-awesome-rails"
-bundle
+```
 
+Run bundle. Require it in application.scss:
 
+```
 @import "font-awesome";
+```
 
-in application.scss
+In the pin show view, display the heart icon for the like link:
 
-In the pin show view:
-
+```rhtml
 <i class="fa fa-heart"></i>
+```
 
+Click on the vote. You will get:
+
+```
 undefined method `upvote_by' for nil:NilClass
+```
 
+Initialize the @pin variable by adding the upvote action to `before_action` in pins controller.
+
+```ruby
 before_action :set_pin, only: [:show, :edit, :update, :destroy, :upvote]
-  
+```
+
+You will now get the error:
+
+```  
 Couldn't find Pin with 'id'=
+```
 
-rake routes | grep like
+Currently the route for like is:
+
+```
+rails routes | grep like
                 pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
-				
-  resources :pins do
-    member do
-      put 'like', to: 'pins#upvote'
-    end
+```
+
+Let's enclose the like route within the member block.
+
+```ruby				
+resources :pins do
+  member do
+    put 'like', to: 'pins#upvote'
   end
+end
+```
 
+You will now get the error:
+
+```
 undefined method `pin_like_path' 
+```
 
-rake routes | grep like
+Let's look at the route for like link:
+
+```
+rails routes | grep like
+```
+
+The output shows:
+
+```
 like_pin PUT    /pins/:id/like(.:format)       pins#upvote			  
+```
 
+Change the like link in pin show.
 
+```rhtml
 like_pin_path(@pin) 
+```
 
-in pin show page.
+We need to protect all actions except index and show from users who are not logged in. Add the `before_action` in pins controller that uses devise method to protect those actions.
 
-  before_action :authenticate_user!, except: [:index, :show]
+```ruby
+before_action :authenticate_user!, except: [:index, :show]
+```
   
-  in pins controller.
+Now you can like any puppy by clicking the heart icon.
 
-Now you can like for any puppy by clicking the heart icon.
+## Summary
 
-[Twitter Bootstrap 3 in a Rails 4 Application](http://www.erikminkel.com/2013/09/01/twitter-bootstrap-3-in-a-rails-4-application/ 'Twitter Bootstrap 3 in a Rails 4 Application')
-[Rails 4: How to Include Bootstrap Glyphicons](http://www.angkorbrick.com/2014/11/06/rails-4-how-to-include-bootstrap-glyphicons/ 'Rails 4: How to Include Bootstrap Glyphicons')
-[FontAwesome Rails Gem](https://github.com/bokmann/font-awesome-rails 'font-awesome-rails')  
-[FontAwesome Cheatsheet](http://fontawesome.io/cheatsheet/ 'font awesome cheatsheet')
- 
- 
- 
- 
- 
- 
+In this article, you learned how to develop a Pinterest clone using masonry-rails, acts_as_votable, bootstrap 4, devise in Rails 5.
+
+## References
+
+- [Twitter Bootstrap 3 in a Rails 4 Application](http://www.erikminkel.com/2013/09/01/twitter-bootstrap-3-in-a-rails-4-application/ 'Twitter Bootstrap 3 in a Rails 4 Application')
+- [Rails 4: How to Include Bootstrap Glyphicons](http://www.angkorbrick.com/2014/11/06/rails-4-how-to-include-bootstrap-glyphicons/ 'Rails 4: How to Include Bootstrap Glyphicons')
+- [FontAwesome Rails Gem](https://github.com/bokmann/font-awesome-rails 'font-awesome-rails')  
+- [FontAwesome Cheatsheet](http://fontawesome.io/cheatsheet/ 'font awesome cheatsheet')
