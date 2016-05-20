@@ -81,9 +81,7 @@ to layout. You will now be able to signup, signin and logout.
 gem "paperclip", "~> 5.0.0.beta1"
 ```
 
-bundle
-
-Add:
+Run bundle. Add:
 
 ```ruby
 has_attached_file :image, :styles => { :medium => "300x300>" }
@@ -142,7 +140,7 @@ end
 You can now upload and view the image.
 
 
-## Transition Effects using MasonryRails Gem
+## Transition Effects using Masonry Rails Gem
 
 Add masonry-rails gem to Gemfile.
 
@@ -340,16 +338,13 @@ Add signup, register, logout, account and new pin links in `layouts/_header.html
 <nav class="navbar navbar-dark bg-inverse navbar-fixed-top">
   <%= link_to "Puppy Reviews", root_path, class: "navbar-brand" %>
   <ul class="nav navbar-nav">
-
     <% if user_signed_in? %>
       <li class="nav-item">
         <%= link_to "New Pin", new_pin_path, class: 'nav-link' %>
       </li>
-
       <li class="nav-item">
 		<%= link_to "Account", edit_user_registration_path, class: 'nav-link' %>
       </li>
-
       <li class="nav-item">
 		<%= link_to "Sign Out", destroy_user_session_path, method: :delete, class: 'nav-link' %>
       </li>	  
@@ -357,22 +352,20 @@ Add signup, register, logout, account and new pin links in `layouts/_header.html
 	    <li class="nav-item">
 			<%= link_to "Sign Up", new_user_registration_path, class: 'nav-link' %>	
 	    </li>
-
 	    <li class="nav-item">
 			<%= link_to "Sign In", new_user_session_path, class: 'nav-link' %>
 	    </li>
     <% end %>
-		
   </ul>
 </nav>
 ```
- 
+
 Add:
 
-``` 
+```rhtml
 <%= render 'layouts/header' %>
 ```
- 
+
 to layout file. In application.js:
 
 ``` 
@@ -474,8 +467,8 @@ pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
 
 Link the like icon to this path in the pin show page.
 
-``` 
- <%= link_to pin_like_path(@pin), method: :put, class: "btn btn-default" do %>
+```rhtml
+ <%= link_to pin_like_path(@pin), method: :put, class: "btn btn-secondary" do %>
  ...
 ```
  
@@ -519,7 +512,7 @@ Currently the route for like is:
 
 ```
 rails routes | grep like
-                pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
+pin_like PUT    /pins/:pin_id/like(.:format)   pins#upvote
 ```
 
 Let's enclose the like route within the member block.
@@ -562,7 +555,7 @@ We need to protect all actions except index and show from users who are not logg
 before_action :authenticate_user!, except: [:index, :show]
 ```
   
-Now you can like any puppy by clicking the heart icon.
+Now you must be logged in to like any puppy by clicking the heart icon.
 
 ## Summary
 
