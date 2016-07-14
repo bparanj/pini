@@ -4,6 +4,29 @@ class PinsController < ApplicationController
   # GET /pins
   # GET /pins.json
   def index
+    logger.info "*" * 80
+    
+    logger.info request.remote_ip
+    logger.info request.user_agent
+    logger.info request.referer
+    logger.info request.original_url
+    logger.info request.params["platform"]
+    logger.info request.params["app_version"]
+    logger.info request.params['os_version']
+    logger.info request.params["screen_width"]
+    logger.info request.params["screen_height"]
+    
+    out = RefererParser::Parser.new.parse(request.referer)
+    logger.info out
+    
+    logger.info "*" * 80
+    
+    
+    
+    
+    
+    
+    
     @pins = Pin.all
   end
 

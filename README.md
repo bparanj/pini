@@ -567,3 +567,6 @@ In this article, you learned how to develop a Pinterest clone using masonry-rail
 - [Rails 4: How to Include Bootstrap Glyphicons](http://www.angkorbrick.com/2014/11/06/rails-4-how-to-include-bootstrap-glyphicons/ 'Rails 4: How to Include Bootstrap Glyphicons')
 - [FontAwesome Rails Gem](https://github.com/bokmann/font-awesome-rails 'font-awesome-rails')  
 - [FontAwesome Cheatsheet](http://fontawesome.io/cheatsheet/ 'font awesome cheatsheet')
+
+
+https://github.com/alexreisner/geocoder/issues/966

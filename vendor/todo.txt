@@ -1,0 +1,437 @@
+rails new todo
+
+rails g scaffold list title description:text
+
+rails db:migrate
+
+root 'lists#index'
+  
+rails g model item content list:references
+
+class List < ApplicationRecord
+  has_many :items
+end
+
+rails db:migrate
+
+resources :lists do
+  resources :items
+end
+
+rails g controller items
+
+class ItemsController < ApplicationController
+  def create
+    @list = List.find(params[:list_id])
+    @item = @list.items.create(params[:item].permit(:content))
+    
+    redirect_to @list
+  end
+end
+
+_item.html.erb
+
+<p>
+	<%= item.content %>
+</p>
+
+_form.html.erb
+
+<%= form_for([@list, @list.items.build]) do |f| %>
+  <%= f.text_field :content, placeholder: 'New todo' %>
+  <%= f.submit %>
+<% end %>
+
+Display items in list show page.
+
+<p>
+  <strong>Title:</strong>
+  <%= @list.title %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @list.description %>
+</p>
+
+<div>
+	<%= render @list.items %>
+	<div id='form'>
+		<%= render 'items/form' %>
+	</div>
+</div>
+<%= link_to 'Edit', edit_list_path(@list) %> |
+<%= link_to 'Back', lists_path %>
+
+Start the server and go to list show page. You can create items under a list.
+
+
+<p>
+	<%= item.content %>
+</p>
+
+<%= link_to 'Delete', list_item_path(@list, item.id), method: :delete, data: { confirm: 'Are you sure?'} %>
+
+def destroy
+  @list = List.find(params[:list_id])
+  @item = @list.items.find(params[:id])
+  if @item.destroy
+    flash[:success] = 'List item deleted'
+  else
+    flash[:error] = 'Item could not be deleted'
+  end
+  
+  redirect_to @list
+end
+
+You can now delete items.
+
+rails g migration add_completed_at_to_items completed_at:datetime
+
+rails db:migrate
+
+  resources :lists do
+    resources :items do
+      member do
+        patch :complete
+      end
+    end
+  end
+
+rails routes
+
+            Prefix Verb   URI Pattern                                  Controller#Action
+complete_list_item PATCH  /lists/:list_id/items/:id/complete(.:format) items#complete
+        list_items GET    /lists/:list_id/items(.:format)              items#index
+                   POST   /lists/:list_id/items(.:format)              items#create
+     new_list_item GET    /lists/:list_id/items/new(.:format)          items#new
+    edit_list_item GET    /lists/:list_id/items/:id/edit(.:format)     items#edit
+         list_item GET    /lists/:list_id/items/:id(.:format)          items#show
+                   PATCH  /lists/:list_id/items/:id(.:format)          items#update
+                   PUT    /lists/:list_id/items/:id(.:format)          items#update
+                   DELETE /lists/:list_id/items/:id(.:format)          items#destroy
+             lists GET    /lists(.:format)                             lists#index
+                   POST   /lists(.:format)                             lists#create
+          new_list GET    /lists/new(.:format)                         lists#new
+         edit_list GET    /lists/:id/edit(.:format)                    lists#edit
+              list GET    /lists/:id(.:format)                         lists#show
+                   PATCH  /lists/:id(.:format)                         lists#update
+                   PUT    /lists/:id(.:format)                         lists#update
+                   DELETE /lists/:id(.:format)                         lists#destroy
+              root GET    /                                            lists#index
+
+In items/_item.html.erb
+
+<%= link_to 'Mark as Complete', complete_list_item_path(@list, item.id), method: :patch %>
+
+Mark as complete will work now.
+
+Add mark as complete to the items/_item.html.erb:
+
+
+<div class='row clearfix'>
+  <% if item.completed? %>
+    <div class='complete'>
+    	<%= link_to 'Mark as Complete', complete_list_item_path(@list, item.id), method: :patch %>
+    </div>	
+	<div class='item'>
+		<p style='opacity: 0.4'> <strike><%= item.content %></strike> </p>
+	</div>
+	<div class='trash'>
+		<%= link_to 'Delete', list_item_path(@list, item.id), method: :delete, data: { confirm: 'Are you sure?'} %>
+	</div>
+  <% else %>
+	<div class='complete'>
+		<%= link_to 'Mark as Complete', complete_list_item_path(@list, item.id), method: :patch %>
+	</div>
+	<div class='item'>
+		<p> <%= item.content %></p>
+	</div>
+	<div class='trash'>
+		<%= link_to 'Delete', list_item_path(@list, item.id), method: :delete, data: { confirm: 'Are you sure?'} %>
+	</div>
+  <% end %>
+</div>
+
+class Item < ApplicationRecord
+  belongs_to :list
+  
+  def completed?
+  	completed_at.present?
+  end
+  
+end
+
+Mark a item as complete will strike out the completed item.
+
+
+
+Rename application.css to application.scss and delete scaffold.css, items.scss and lists.scss.
+
+Copy the following css to application.scss.
+
+```
+ $white_opaque: rgba(250, 250, 250, .3);
+ $dark: #1F7972;
+
+* {
+	box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+
+body {
+ 	height: 100%;
+  background: -webkit-linear-gradient(40deg, #4CB8C4 10%, #EAECC6 100%);
+  background:    -moz-linear-gradient(40deg, #4CB8C4 10%, #EAECC6 100%);
+  background:     -ms-linear-gradient(40deg, #4CB8C4 10%, #EAECC6 100%);
+  background:      -o-linear-gradient(40deg, #4CB8C4 10%, #EAECC6 100%);
+  background:         linear-gradient(40deg, #4CB8C4 10%, #EAECC6 100%);
+  font-family: 'Lato', sans-serif;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+#notice {
+	text-align: center;
+	font-size: 0.6em;
+	color: $dark;
+	font-weight: 100;
+}
+
+.container {
+	width: 50%;
+	max-width: 750px;
+	background: $white_opaque;
+	margin: 3em auto 0 auto;
+	border-radius: 7px;
+	-webkit-box-shadow: 0 0 4px 3px rgba(0,0,0,.3);
+	box-shadow: 0 0 4px 4px rgba(0,0,0,.03);
+	padding: 1em 0;
+}
+
+.todo_list_title {
+	text-align: center;
+	font-weight: 700;
+	font-size: 2.5rem;
+	text-transform: uppercase;
+	color: white;
+	margin: 0;
+	a {
+		text-decoration: none;
+		color: white;
+		transition: all .4s ease-in-out;
+		&:hover {
+			opacity: 0.4;
+		}
+	}
+}
+
+.todo_list_sub_title {
+	margin: 0 0 3em 0;
+	text-align: center;
+	font-size: 0.9em;
+	color: $dark;
+	font-weight: 100;
+}
+
+.index_row {
+	padding: 2em;
+	border-bottom: 1px solid rgba(250,250,250, .3);
+	.todo_list_sub_title {
+		margin-bottom: 0;
+	}
+}
+
+#todo_items_wrapper {
+	.row {
+		width: 100%;
+		border-top: 1px solid rgba(250,250,250, .3);
+		border-bottom: 1px solid rgba(250,250,250, .3);
+		.complete {
+			width: 10%;
+			float: left;
+			text-align: center;
+			border-right: 1px solid rgba(250,250,250, .3);
+			padding: 1em 0;
+		}
+		.todo_item {
+			width: 80%;
+			float: left;
+			p {
+				margin: 0;
+				padding: 1em;
+				color: $dark;
+				font-weight: 100;
+			}
+		}
+		.trash {
+			width: 10%;
+			float: left;
+			text-align: center;
+			border-left: 1px solid rgba(250,250,250, .3);
+			padding: 1em 0;
+		}
+		i {
+			color: white;
+			transition: all .4s ease-in-out;
+			&:hover {
+				color: $dark;
+			}
+		}
+	}
+	#form {
+		margin-top: 2em;
+		padding: 0 5%;
+		input[type="text"] {
+			width: 72%;
+			margin-right: 2%;
+			display: inline-block;
+			outline: none;
+			background: rgba(250,250,250,.4);
+			border: none;
+			height: 40px;
+			border-radius: 4px;
+			padding: 1em 2em;
+		}
+		input[type="submit"] {
+			background: rgba(250,250,250,.4);
+			outline: none;
+			border: none;
+			height: 40px;
+			border-radius: 4px;
+			width: 25%;
+			display: inline-block;
+			transition: all .4s ease-in-out;
+			cursor: pointer;
+			&:hover {
+				background: $dark;
+			}
+		}
+		::-webkit-input-placeholder { color: $dark; }
+	}
+}
+
+.links {
+	display: block;
+	margin: 1.5em auto 0 auto;
+	text-align: center;
+	font-size: 0.8em;
+	color: white;
+	a {
+		color: white;
+	}
+}
+
+.forms {
+	padding: 0 5%;
+}
+label {
+	color: $dark;
+}
+input[type="text"], textarea {
+	width: 100%;
+	margin: .5em 2% 1em 0;
+	display: inline-block;
+	outline: none;
+	background: rgba(250,250,250,.4);
+	border: none;
+	height: 40px;
+	border-radius: 4px;
+	padding: 1em 2em;
+}
+textarea {
+	height: 200px;
+}
+input[type="submit"] {
+	background: white;
+	outline: none;
+	border: none;
+	height: 40px;
+	border-radius: 4px;
+	width: 25%;
+	display: inline-block;
+	transition: all .4s ease-in-out;
+	cursor: pointer;
+	color: $dark;
+	&:hover {
+		background: $dark;
+		color: white;
+	}
+}
+::-webkit-input-placeholder { color: $dark; }
+```
+
+  <body class='container'>
+    <%= yield %>
+  </body>
+
+
+Replace the existing code in lists/index.html.erb with:
+
+<% @lists.each do |list| %>
+  <div class='index_row clearfix'>
+  	<h2 class='todo_list_title'> <%= link_to list.title, list %> </h2>
+	<p class='list_sub_title'> <%= list.description %> </p>
+  </div>
+<% end %>
+
+Reload the browser. You will now see the styled home page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="row clearfix">
+	<% if item.completed? %>
+		<div class="complete">
+			<%= link_to complete_list_item_path(@list, item.id), method: :patch do %>
+				<i style="opacity: 0.4;" class="fa fa-check"></i>
+			<% end %>
+		</div>
+		<div class="todo_item">
+			<p style="opacity: 0.4;"><strike><%= item.content %></strike></p>
+		</div>
+		<div class="trash">
+			<%= link_to list_item_path(@list, item.id), method: :delete, data: { confirm: "Are you sure?" } do %>
+				<i class="fa fa-trash"></i>
+			<% end %>
+		</div>
+	<% else %>
+		<div class="complete">
+			<%= link_to complete_list_item_path(@list, item.id), method: :patch do %>
+				<i class="fa fa-check"></i>
+			<% end %>
+		</div>
+		<div class="todo_item">
+			<p><%= item.content %></p>
+		</div>
+		<div class="trash">
+			<%= link_to list_item_path(@list, item.id), method: :delete, data: { confirm: "Are you sure?" } do %>
+				<i class="fa fa-trash"></i>
+			<% end %>
+		</div>
+	<% end %>
+</div>
+
+

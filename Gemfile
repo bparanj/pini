@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '>= 5.0.0.rc1', '< 5.1'
+gem 'rails'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use Puma as the app server
@@ -20,12 +20,18 @@ gem 'jquery-rails'
 gem 'turbolinks', '~> 5.x'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
-gem 'devise', github: 'plataformatec/devise'
+gem 'devise', :github => 'plataformatec/devise', :branch => 'master'
 gem "paperclip", "~> 5.0.0.beta1"
 gem 'masonry-rails'
 gem 'bootstrap', '~> 4.0.0.alpha3'
-gem 'acts_as_votable', '~> 0.10.0'
+gem 'acts_as_votable'
 gem "font-awesome-rails"
+gem 'geocoder'
+gem 'referer-parser'
+gem 'browser'
+gem 'user_agent_parser'
+gem 'addressable'
+gem 'uuidtools'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
