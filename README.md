@@ -556,7 +556,7 @@ We need to protect all actions except index and show from users who are not logg
 before_action :authenticate_user!, except: [:index, :show]
 ```
   
-Now you must be logged in to like any puppy by clicking the heart icon.
+Now you must be logged in to like any puppy by clicking the heart icon. You can download the source code for this article from ``.
 
 ## Summary
 
