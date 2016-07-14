@@ -1,6 +1,15 @@
 D
 How to build a Pinterest Clone in Rails 5
 
+## Libraries Used
+
+- Devise
+- Paperclip
+- Masonry
+- Twitter Bootstrap 4
+- Font Awesome
+- Acts as Votable
+
 ## Starter Rails 5 App
 
 Create a new Rails 5 project and pin resource.
