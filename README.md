@@ -1,4 +1,6 @@
-D
+# Watch the Screencast
+[![Pinterest Clone in Rails 5](https://d2d8g20jj5tev4.cloudfront.net/rubyplus-screencast.png)](https://rubyplus.com/episodes/31-Pinterest-Clone-in-Rails-5)
+
 How to build a Pinterest Clone in Rails 5
 
 ## Libraries Used
